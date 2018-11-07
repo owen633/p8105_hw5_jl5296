@@ -33,6 +33,18 @@ names(file_df)[1] = "file_name"
 file_df
 ```
 
+#### Iterate over file names and load data for each subject as nested list columns
+
+```{r}
+#  Read in observation data for each subject as list columns
+combine_df = 
+  file_df %>%
+  mutate(file_path = paste(".//data//", file_name, sep = "")) %>% 
+  mutate(data = map(.x = file_path, ~read_csv(file = .x)))
+
+combine_df
+  
+```
 
 
 
