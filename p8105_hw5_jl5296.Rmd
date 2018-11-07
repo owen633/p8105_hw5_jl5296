@@ -70,10 +70,11 @@ clean_df %>%
   geom_point(alpha = .5) + geom_line() +
   facet_grid(.~arm) +
   labs(
-    title = "Comparing Observation for each Subject Over Time Between Control and Experimental Group",
+    title = "Comparing Observation for each Subject Over Time \n Between Control and Experimental Group",
     x = "Week",
     y = "Observation Units"
-  )
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
-
+**Comment:** Overall, subjects in the experimental arm show higher observation units over time, on average, than those in the control arm.
 
