@@ -62,7 +62,7 @@ clean_df = combine_df %>%
 print(clean_df, 10)
   
 ```
-#### Plot observations on each subject over time
+### Plot observations on each subject over time
 ```{r}
 # Make spaghetti plot
 clean_df %>% 
@@ -70,11 +70,50 @@ clean_df %>%
   geom_point(alpha = .5) + geom_line() +
   facet_grid(.~arm) +
   labs(
-    title = "Comparing Observation for each Subject Over Time \n Between Control and Experimental Group",
+    title = "Comparison of Observation for each Subject Over Time \n Between Control and Experimental Group",
     x = "Week",
     y = "Observation Units"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-**Comment:** Overall, subjects in the experimental arm show higher observation units over time, on average, than those in the control arm.
+
+**Comment:** Overall, subjects in the experimental arm show higher observation units over time, on average, than those in the control arm. Moreover, observations for the subjects in the experimental group appears to be increasing over time; whereas no apparent pattern exists for the control group.
+
+## Problem 2
+### Read and describe raw data
+
+```{r}
+raw_hom_data = read.csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
+
+head(raw_hom_data)
+```
+The raw dataset is of size `r dim(raw_hom_data)` with `r nrow(raw_hom_data)` observations and `r ncol(raw_hom_data)` variables. Each observation/row represents a single criminal homicide inflicted to a victim. Some key variables include the geographic location of each case, whether an arrest was made, and basic demographic information about each victim.
+
+#### Create city_state variable and summarize total number of homicides as well as the number of unsolved ones.
+
+```{r}
+# Merge city and state into one variable
+new_hom_data = raw_hom_data %>% 
+  unite(city, state, col = "city_state", sep = ",")
+
+# Summarize within cities to find number of homicide 
+tot_hom_data = new_hom_data %>% 
+  group_by(city_state) %>% 
+  summarize(total_homicide = n())
+
+# Summarize within cities to find number of unsolved crimes
+unsolv_hom_data = new_hom_data %>% 
+  filter(disposition == "Closed without arrest" | disposition == "Open/No arrest") %>% 
+  group_by(city_state) %>% 
+  summarize(unsolved_homicides = n())
+  
+# Join datasets
+city_hom_data = left_join(tot_hom_data, unsolv_hom_data, by = "city_state")
+
+# First 10 rows of resulting dataset
+print(city_hom_data, 10)
+
+```
+
+
 
