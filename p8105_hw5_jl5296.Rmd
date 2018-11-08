@@ -128,5 +128,22 @@ low_CI = pull(tidy_output, conf.low)
 high_CI = pull(tidy_output, conf.high)
 
 ```
-According to the results of the test, the point estimate of the proportion of unsolved crimes in Baltimore, MD is `r est_prop`; and we can be 95% confident that the true proportion of unsolved homicides in this city is between `r low_CI` and `r high_CI`
+According to the results of the test, the *point estimate* of the proportion of unsolved crimes in Baltimore, MD is **`r est_prop`**; and we can be *95% confident* that the true proportion of unsolved homicides in this city is between **`r low_CI`** and **`r high_CI`**
+
+### All City Analysis
+#### Estimate proportions and CIs for each city
+
+```{r}
+# Run prop.test for every city excluding Tulsa and store result as a list column
+test_data = city_hom_data %>% 
+  filter(city_state != "Tulsa,AL") %>% 
+  mutate(test_stats = map2(.x = unsolved_homicides, .y = total_homicide, ~prop.test(x = .x, n= .y) %>% broom::tidy()))
+
+#First few rows of resulting data frame
+head(test_data)
+  
+  
+ 
+```
+
 
