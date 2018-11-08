@@ -137,9 +137,12 @@ According to the results of the test, the *point estimate* of the proportion of 
 # Run prop.test for every city excluding Tulsa and store result as a list column
 test_data = city_hom_data %>% 
   filter(city_state != "Tulsa,AL") %>% 
-  mutate(test_stats = map2(.x = unsolved_homicides, .y = total_homicide, ~prop.test(x = .x, n= .y) %>% broom::tidy()))
+  mutate(test_stats = map2(.x = unsolved_homicides, .y = total_homicide, ~prop.test(x = .x, n= .y) %>% broom::tidy())) %>% 
+# Unnest to extract estimates and CIs for each city
+unnest() %>% 
+  select(city_state, total_homicide, unsolved_homicides, estimate, conf.low, conf.high)
 
-#First few rows of resulting data frame
+# First few rows of resulting data frame
 head(test_data)
   
   
