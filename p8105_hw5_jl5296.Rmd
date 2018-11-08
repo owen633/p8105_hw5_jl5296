@@ -145,8 +145,24 @@ unnest() %>%
 # First few rows of resulting data frame
 head(test_data)
   
-  
- 
+```
+*   Note: **Tulsa, AL** was ommitted from the dataframe since it has missing value for "*unsolved homicides*" and thus cannot be used to compute a proportion.
+
+#### Create plot to show estimates and CIs for each city
+```{r}
+# Generate bar graph with error bars
+test_data %>% 
+  mutate(city_state = fct_reorder(city_state, estimate)) %>% 
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point(alpha = .5) +
+  geom_errorbar(aes(ymin = conf.low , ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(
+    title = "Estimates of Proportion of Unsolved Crimes and CIs for each City",
+    x = "City",
+    y = "Estimate Proportion of Unsolved Crimes"
+  )
+
 ```
 
 
