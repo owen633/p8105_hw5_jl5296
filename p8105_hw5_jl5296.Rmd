@@ -16,14 +16,13 @@ knitr::opts_chunk$set(
 
 theme_set(theme_bw() + theme(legend.position = "bottom"))
 
-
 ```
 ## Problem 1
 ### Create tidy dataframe
 
 #### Generate dataframe containing all file names
 
-```{r}
+```{r df}
 # Create dataframe containing all 20 file names in the directory
 file_df = tibble(
   list.files(path = ".//data", all.files = FALSE)) 
@@ -35,7 +34,7 @@ file_df
 
 #### Iterate over file names and load data for each subject as nested list columns
 
-```{r}
+```{r iterate_load}
 #  Read in observation data for each subject as list columns
 combine_df = 
   file_df %>%
@@ -47,7 +46,7 @@ combine_df
 ```
 #### Tidy resulting dataset
 
-```{r}
+```{r tidy_data}
 # Clean data for exploratory analysis
 clean_df = combine_df %>% 
   mutate(file_name = str_replace(file_name, ".csv$", "")) %>% 
@@ -63,7 +62,7 @@ print(clean_df, 10)
   
 ```
 ### Plot observations on each subject over time
-```{r}
+```{r spa_plot}
 # Make spaghetti plot
 clean_df %>% 
   ggplot(aes(x = week, y = observation, color = subject_id)) +
@@ -82,7 +81,7 @@ clean_df %>%
 ## Problem 2
 ### Read and describe raw data
 
-```{r}
+```{r import_raw_data}
 raw_hom_data = read.csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
 head(raw_hom_data)
@@ -91,7 +90,7 @@ The raw dataset is of size `r dim(raw_hom_data)` with `r nrow(raw_hom_data)` obs
 
 #### Create city_state variable and summarize total number of homicides as well as the number of unsolved ones.
 
-```{r}
+```{r manipulate_data}
 # Merge city and state into one variable
 new_hom_data = raw_hom_data %>% 
   unite(city, state, col = "city_state", sep = ",")
@@ -117,7 +116,7 @@ print(city_hom_data, 10)
 ### Baltimore, MD Analysis
 #### Estimate proportion and confidence intervals
 
-```{r}
+```{r balt_prop_test}
 # Run prop.test for Baltimore, MD
 balt_prop_test = prop.test(1825, 2827, p = 0.5, conf.level = 0.95)
 tidy_output = broom::tidy(balt_prop_test)
@@ -133,7 +132,7 @@ According to the results of the test, the *point estimate* of the proportion of 
 ### All City Analysis
 #### Estimate proportions and CIs for each city
 
-```{r}
+```{r all_city_proptest}
 # Run prop.test for every city and store result as a list column
 test_data = city_hom_data %>% 
   mutate(test_stats = map2(.x = unsolved_homicides, .y = total_homicide, ~prop.test(x = .x, n= .y) %>% broom::tidy())) %>% 
@@ -147,7 +146,7 @@ head(test_data)
 ```
 
 #### Create plot to show estimates and CIs for each city
-```{r}
+```{r est_ci_plot}
 # Generate bar graph with error bars
 test_data %>% 
   mutate(city_state = fct_reorder(city_state, estimate)) %>% 
