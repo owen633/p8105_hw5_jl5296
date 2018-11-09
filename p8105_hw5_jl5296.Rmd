@@ -108,7 +108,7 @@ unsolv_hom_data = new_hom_data %>%
   summarize(unsolved_homicides = n())
   
 # Join datasets
-city_hom_data = left_join(tot_hom_data, unsolv_hom_data, by = "city_state")
+city_hom_data = left_join(unsolv_hom_data, tot_hom_data, by = "city_state")
 
 # First 10 rows of resulting dataset
 print(city_hom_data, 10)
@@ -134,9 +134,8 @@ According to the results of the test, the *point estimate* of the proportion of 
 #### Estimate proportions and CIs for each city
 
 ```{r}
-# Run prop.test for every city excluding Tulsa and store result as a list column
+# Run prop.test for every city and store result as a list column
 test_data = city_hom_data %>% 
-  filter(city_state != "Tulsa,AL") %>% 
   mutate(test_stats = map2(.x = unsolved_homicides, .y = total_homicide, ~prop.test(x = .x, n= .y) %>% broom::tidy())) %>% 
 # Unnest to extract estimates and CIs for each city
 unnest() %>% 
@@ -146,7 +145,6 @@ unnest() %>%
 head(test_data)
   
 ```
-*   Note: **Tulsa, AL** was ommitted from the dataframe since it has missing value for "*unsolved homicides*" and thus cannot be used to compute a proportion.
 
 #### Create plot to show estimates and CIs for each city
 ```{r}
@@ -155,7 +153,7 @@ test_data %>%
   mutate(city_state = fct_reorder(city_state, estimate)) %>% 
   ggplot(aes(x = city_state, y = estimate)) +
   geom_point(alpha = .5) +
-  geom_errorbar(aes(ymin = conf.low , ymax = conf.high)) +
+  geom_errorbar(aes(ymin = conf.low , ymax = conf.high), color = "blue") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(
     title = "Estimates of Proportion of Unsolved Crimes and CIs for each City",
@@ -164,5 +162,5 @@ test_data %>%
   )
 
 ```
-
+*   **Note**: Error bars represent upper and lower limits of the confidence intervals.
 
