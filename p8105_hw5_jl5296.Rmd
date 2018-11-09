@@ -161,5 +161,6 @@ test_data %>%
   )
 
 ```
+
 *   **Note**: Error bars represent upper and lower limits of the confidence intervals.
 
